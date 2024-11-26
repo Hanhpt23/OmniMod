@@ -1,5 +1,5 @@
 model:
-  arch: silvar
+  arch: OmniMod
   model_type: pretrain
   max_txt_len: 1024
   image_size: 224

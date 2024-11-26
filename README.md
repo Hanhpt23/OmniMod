@@ -1,13 +1,13 @@
-# SILVAR - Reasoning Speech Instruction with Visual Language Model for Object Localization and Text Generation
+# OmniMod - Reasoning Speech Instruction with Visual Language Model for Object Localization and Text Generation
 
 
 ## Installation
 
 ```bash
-conda create -n silvar python=3.10.13
-conda activate silvar
-git clone https://github.com/Hanhpt23/SilVar.git
-cd SilVar
+conda create -n OmniMod python=3.10.13
+conda activate OmniMod
+git clone https://github.com/Hanhpt23/OmniMod.git
+cd OmniMod
 pip install -r requirements.txt
 ```
 
@@ -45,7 +45,7 @@ torchrun --nproc_per_node 2 train.py \
 
 - To submit to an HPC:
 ```bash
-sbatch scripts/silvar/train.sh
+sbatch scripts/OmniMod/train.sh
 ```
 
 ## Evaluation
@@ -58,12 +58,12 @@ torchrun --nproc_per_node 2 evaluate.py \
 
 - To submit to an HPC:
 ```bash
-sbatch scripts/silvar/evaluate.sh
+sbatch scripts/OmniMod/evaluate.sh
 ```
 
 ## Dataset structure
 ```
-Silvar
+OmniMod
 ├── train
 │   ├── audio
 │   ├── images
@@ -77,7 +77,7 @@ Silvar
     └── checkpoint_19.pth
 ```
 
-#### Structure of `Silvar_sets.json`
+#### Structure of `OmniMod_sets.json`
 ```
 [
       {

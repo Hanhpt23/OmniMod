@@ -16,23 +16,23 @@ import torch
 import torch.backends.cudnn as cudnn
 import wandb
 
-import silvar.tasks as tasks
-from silvar.common.config import Config
-from silvar.common.dist_utils import get_rank, init_distributed_mode
-from silvar.common.logger import setup_logger
-from silvar.common.optims import (
+import OmniMod.tasks as tasks
+from OmniMod.common.config import Config
+from OmniMod.common.dist_utils import get_rank, init_distributed_mode
+from OmniMod.common.logger import setup_logger
+from OmniMod.common.optims import (
     LinearWarmupCosineLRScheduler,
     LinearWarmupStepLRScheduler,
 )
-from silvar.common.registry import registry
-from silvar.common.utils import now
+from OmniMod.common.registry import registry
+from OmniMod.common.utils import now
 
 # imports modules for registration
-from silvar.models import *
+from OmniMod.models import *
 from evaluate import *
-from silvar.processors import *
-from silvar.runners import *
-from silvar.tasks import *
+from OmniMod.processors import *
+from OmniMod.runners import *
+from OmniMod.tasks import *
 
 def list_of_str(arg):
     return list(map(str, arg.split(',')))
@@ -108,7 +108,7 @@ def main():
     if hasattr(args, 'cfg_eval_path'):
         args.cfg_path = args.cfg_eval_path
 
-        model_path = "silvar/{}/{}".format(cfg.run_cfg.output_dir, job_id)
+        model_path = "OmniMod/{}/{}".format(cfg.run_cfg.output_dir, job_id)
         ckpt_paths = glob.glob(os.path.join(model_path, "*.pth"))
         ckpt_names = [os.path.basename(ckp_path) for ckp_path in ckpt_paths]
         last_ckpt_name = sorted(ckpt_names, key=lambda x: int(x.split(".")[0].split("_")[-1]))[-1]

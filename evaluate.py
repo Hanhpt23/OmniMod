@@ -1,12 +1,12 @@
 import os
 import argparse
 import json
-from silvar.datasets.datasets.audio_instruction import AudioInstruction
+from OmniMod.datasets.datasets.audio_instruction import AudioInstruction
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-from silvar.common.registry import registry
-from silvar.common.config import Config
-from silvar.conversation.conversation import Conversation, SeparatorStyle
+from OmniMod.common.registry import registry
+from OmniMod.common.config import Config
+from OmniMod.conversation.conversation import Conversation, SeparatorStyle
 
 CONV_VISION = Conversation(
     system="",

@@ -1,8 +1,8 @@
 import gradio as gr
 import json
-from silvar.common.registry import registry
-from silvar.common.config import Config
-from silvar.conversation.conversation import Conversation, SeparatorStyle
+from OmniMod.common.registry import registry
+from OmniMod.common.config import Config
+from OmniMod.conversation.conversation import Conversation, SeparatorStyle
 from PIL import Image
 import torchaudio
 import argparse

@@ -1,5 +1,5 @@
 model:
-  arch: silvar
+  arch: OmniMod
   model_type: pretrain
   max_txt_len: 1024
   image_size: 224
@@ -66,6 +66,6 @@ run:
 
   wandb_log: True
   wandb_token: "your-wandb-token"
-  job_name: Silvar_audio
+  job_name: OmniMod_audio
 
 
