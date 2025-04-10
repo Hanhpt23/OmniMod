@@ -11,7 +11,7 @@ cd SilVarMed
 pip install -r requirements.txt
 ```
 
-
+<!-- 
 ## Training
 ### Visual encoder and audio encoder setting
 We have released our checkpoint [here](https://drive.google.com/file/d/1nYrygg9O4NmaxIptW_nQCyrPoP58U-RK/view?usp=drive_link), you can download and use it as a pretrained weight or for inference.
@@ -87,4 +87,4 @@ OmniMod
       },
       ...
 ]
-```
+``` -->
