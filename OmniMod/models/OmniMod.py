@@ -132,9 +132,9 @@ class OmniMod(OmniModBase):
         with self.maybe_autocast():
             audio_embeds = self.audio_encoder(audio).to(device)
 
-            inputs_language = self.audio_language_proj(audio_embeds)
-            atts_language = torch.ones(inputs_language.size()[:-1], dtype=torch.long).to(audio.device)
-        return inputs_language, atts_language
+            inputs_audio = self.audio_language_proj(audio_embeds)
+            atts_audio = torch.ones(inputs_audio.size()[:-1], dtype=torch.long).to(audio.device)
+        return inputs_audio, atts_audio
 
     @classmethod
     def from_config(cls, cfg):

@@ -14,7 +14,7 @@ from transformers import WhisperProcessor
 
 @registry.register_processor("whisper_processor")
 class WhisperAudioProcessor(BaseProcessor):
-    def __init__(self, model_name="Hanhpt23/whisper-tiny-OmniMod", sampling_rate=16000):
+    def __init__(self, model_name="openai/whisper-tiny", sampling_rate=16000):
         self.audio_processor = WhisperProcessor.from_pretrained(model_name)
         self.sampling_rate = sampling_rate
 
@@ -27,7 +27,7 @@ class WhisperAudioProcessor(BaseProcessor):
         if cfg is None:
             cfg = OmegaConf.create()
 
-        model_name = cfg.get("model_name", "Hanhpt23/whisper-tiny-OmniMod")
+        model_name = cfg.get("model_name", "openai/whisper-tiny")
         sampling_rate = cfg.get("sampling_rate", 16000)
 
         return cls(model_name=model_name, sampling_rate=sampling_rate)

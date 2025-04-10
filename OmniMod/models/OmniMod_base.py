@@ -107,8 +107,33 @@ class OmniModBase(BaseModel):
         
     def prompt_wrap(self, img_embeds, audio_embeds, img_atts, prompts, lengths=None):
         if prompts is None or len(prompts) == 0:
-            # prompts is not provided, just return the original image embedding
+            # print("Prompt case")
+            # If prompts are not provided, combine image and audio embeddings if available
+            if img_embeds is not None and audio_embeds is not None:
+                combined_embeds = []
+                for img_embed, audio_embed in zip(img_embeds, audio_embeds):
+                    combined = torch.cat([img_embed, audio_embed.unsqueeze(0)], dim=1)
+                    combined_embeds.append(combined)
+                
+                emb_lens = [emb.shape[1] for emb in combined_embeds]
+                pad_emb = self.embed_tokens(torch.tensor(self.language_tokenizer.pad_token_id, device=img_embeds.device))
+                
+                max_length = max(emb_lens) if max(emb_lens) < self.max_context_len else self.max_context_len
+                wrapped_embs = pad_emb.expand(len(emb_lens), max_length, -1).clone()
+                wrapped_atts = torch.zeros([len(emb_lens), max_length], dtype=torch.int, device=img_embeds.device)
+                
+                for i, emb in enumerate(combined_embeds):
+                    length = emb_lens[i] if emb_lens[i] < self.max_context_len else self.max_context_len
+                    wrapped_embs[i, :length] = emb[:, :length]
+                    wrapped_atts[i, :length] = 1
+                return wrapped_embs, wrapped_atts
+            
+            # If only image embeddings are available
             return img_embeds, img_atts
+
+        # if prompts is None or len(prompts) == 0:
+        #     # prompts is not provided, just return the original image embedding
+        #     return img_embeds, img_atts
         elif img_embeds is None:
             # prompt is provided but there is no image embedding. return the prompt embedding in right padding
             self.language_tokenizer.padding_side = "right"
@@ -148,22 +173,32 @@ class OmniModBase(BaseModel):
                     wrapped_emb = torch.cat([wrapped_emb, p_embed], dim=1)
                     emb_lists.append(wrapped_emb)
             else:
-
+                
                 for idx, (each_img_embed, each_prompt, each_audio_embed) in enumerate(zip(img_embeds, prompts, audio_embeds)):
                     pn = each_img_embed.shape[-2]
+                    # aund = each_audio_embed.shape[-2]
+                    # each_audio_embed = each_audio_embed.unsqueeze(0)
+
+                    # print('Each sample: ', each_img_embed, each_prompt, each_audio_embed)
+                    # print('pn: ', pn, 'aund: ', aund)
                     if lengths is not None:
                         each_img_embed = each_img_embed.reshape(-1, each_img_embed.shape[-1])
                         each_img_embed = each_img_embed[:lengths[idx] * pn]
                     p_segs = each_prompt.split('<ImageHere>')
                     interleave_emb = []
-                    for idx, seg in enumerate(p_segs[:-1]):
-                        p_tokens = self.language_tokenizer(
-                            seg, return_tensors="pt", add_special_tokens=False).to(img_embeds.device)
+                    # print('p_segs: ', p_segs)
+
+                    for inner_idx, seg in enumerate(p_segs[:-1]):
+                        # print('seg: ', seg)
+                        # print('each_img_embed[None][:, idx * pn:(idx + 1) * pn]: ', each_img_embed[None][:, idx * pn:(idx + 1) * pn])
+                        p_tokens = self.language_tokenizer(seg, return_tensors="pt", add_special_tokens=False).to(img_embeds.device)
                         p_embed = self.embed_tokens(p_tokens.input_ids)
-                        interleave_emb.append(torch.cat([p_embed, each_img_embed[None][:, idx * pn:(idx + 1) * pn]], dim=1))
+                        # print('Shape: ', p_embed.shape, each_img_embed[None][:, idx * pn:(idx + 1) * pn].shape, each_audio_embed.shape)
+                        interleave_emb.append(torch.cat([p_embed, each_img_embed[None][:, inner_idx * pn:(inner_idx + 1) * pn]], dim=1))
+
+                        # interleave_emb.append(torch.cat([p_embed, each_img_embed[None][:, idx * pn:(idx + 1) * pn], each_audio_embed], dim=1))
                     wrapped_emb = torch.cat(interleave_emb, dim=1)
-                    p_tokens = self.language_tokenizer(
-                        p_segs[-1], return_tensors="pt", add_special_tokens=False).to(img_embeds.device)
+                    p_tokens = self.language_tokenizer(p_segs[-1], return_tensors="pt", add_special_tokens=False).to(img_embeds.device)
                     p_embed = self.embed_tokens(p_tokens.input_ids)
 
                     each_audio_embed = each_audio_embed.unsqueeze(0)
@@ -267,9 +302,9 @@ class OmniModBase(BaseModel):
     def preparing_embedding(self, samples):
         ### prepare input tokens
         if "audio" in samples and "instruction_input" in samples:
-            for instruction_input in samples["instruction_input"]:
-                if not instruction_input.endswith("<Img><ImageHere></Img>"):
-                    raise ValueError("You cannot specify both audio and instruction_input at the same time")
+            # for instruction_input in samples["instruction_input"]:
+            #     if not instruction_input.endswith("<Img><ImageHere></Img>"):
+            #         raise ValueError("You cannot specify both audio and instruction_input at the same time")
             audio_embeds, audio_atts = self.encode_audio(samples["audio"])
 
         else:
@@ -311,6 +346,7 @@ class OmniModBase(BaseModel):
                 img_embeds = img_embeds.reshape(len(samples['image']), -1, pn, hs)
                 cond_embeds, cond_atts = self.prompt_wrap(img_embeds, audio_embeds, img_atts, instruction, samples['length'])
             else:
+                # print('Our input: ', img_embeds, audio_embeds, img_atts, instruction)
                 cond_embeds, cond_atts = self.prompt_wrap(img_embeds, audio_embeds, img_atts, instruction)
 
             ### prepare target tokens
@@ -399,10 +435,10 @@ class OmniModBase(BaseModel):
         '''
             function for generate test use
         '''
-        if audios is not None and texts is not None:
-            for text in texts:
-                if not text.endswith("<Img><ImageHere></Img> [/INST]"):
-                    raise ValueError("You cannot specify both audio and texts at the same time")
+        # if audios is not None and texts is not None:
+        #     for text in texts:
+        #         if not text.endswith("<Img><ImageHere></Img> [/INST]"):
+        #             raise ValueError("You cannot specify both audio and texts at the same time")
                 
         if images is not None and texts is None:
             raise ValueError("You must specify <Img><ImageHere></Img> in the text")

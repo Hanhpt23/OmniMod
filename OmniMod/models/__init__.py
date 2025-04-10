@@ -9,18 +9,18 @@ import logging
 import torch
 from omegaconf import OmegaConf
 
-from silvar.common.registry import registry
-from silvar.models.base_model import BaseModel
-from silvar.models.silvar_base import SilVarBase
-from silvar.models.silvar import SilVar
-from silvar.processors.base_processor import BaseProcessor
+from OmniMod.common.registry import registry
+from OmniMod.models.base_model import BaseModel
+from OmniMod.models.OmniMod_base import OmniModBase
+from OmniMod.models.OmniMod import OmniMod
+from OmniMod.processors.base_processor import BaseProcessor
 
 
 __all__ = [
     "load_model",
     "BaseModel",
-    "SilVarBase",
-    "SilVar"
+    "OmniModBase",
+    "OmniMod"
 ]
 
 
@@ -29,7 +29,7 @@ def load_model(name, model_type, is_eval=False, device="cpu", checkpoint=None):
     Load supported models.
 
     To list all available models and types in registry:
-    >>> from silvar.models import model_zoo
+    >>> from OmniMod.models import model_zoo
     >>> print(model_zoo)
 
     Args:
@@ -115,7 +115,7 @@ def load_model_and_preprocess(name, model_type, is_eval=False, device="cpu"):
     Load model and its related preprocessors.
 
     List all available models and types in registry:
-    >>> from silvar.models import model_zoo
+    >>> from OmniMod.models import model_zoo
     >>> print(model_zoo)
 
     Args:
@@ -162,7 +162,7 @@ class ModelZoo:
     """
     A utility class to create string representation of available model architectures and types.
 
-    >>> from silvar.models import model_zoo
+    >>> from OmniMod.models import model_zoo
     >>> # list all available models
     >>> print(model_zoo)
     >>> # show total number of models

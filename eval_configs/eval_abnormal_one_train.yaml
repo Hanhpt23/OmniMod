@@ -1,0 +1,47 @@
+model:
+  arch: OmniMod
+  model_type: pretrain
+  max_txt_len: 1024
+  image_size: 224
+  end_sym: </s>
+  language_model: meta-llama/Meta-Llama-3-8B
+  vision_model: biomed_clip
+  audio_model: whisper
+  ckpt: OmniMod/Results/abnormal_new/20250115151/checkpoint_9.pth
+  use_grad_checkpoint: true
+  chat_template: true
+  low_resource: true
+  lora_r: 64
+  lora_alpha: 16
+  bits: 8
+datasets:
+  audio_train:
+    audio_processor:
+      train:
+        name: whisper_processor
+    vis_processor:
+      train:
+        name: blip2_image_eval
+        image_size: 224
+    text_processor:
+      train:
+        name: blip_caption
+    build_info:
+      image_path: ../../MedTrinity-25M/Data/slake/Slake/Abnormal_Ours/train/imgs_train_abnormal
+      ann_path: ../../MedTrinity-25M/Data/slake/Slake/Abnormal_Ours/train/dataset_unique_abnormal.json
+      audio_path: ../../MedTrinity-25M/Data/slake/Slake/Abnormal_Ours/train/audio_wav
+evaluation_datasets:
+  audio_val:
+    eval_file_path: ../../MedTrinity-25M/Data/slake/Slake/Abnormal_Ours/train/dataset_unique_abnormal.json
+    img_path: ../../MedTrinity-25M/Data/slake/Slake/Abnormal_Ours/train/imgs_train_abnormal
+    prompt_test: ''
+    audio_path: ../../MedTrinity-25M/Data/slake/Slake/Abnormal_Ours/train/audio_wav
+    batch_size: 2
+    max_new_tokens: 512
+    temperature: 0.1
+    top_p: 0.9
+    do_sample: true
+run:
+  task: image_text_pretrain
+  name: abnormal_evaluation
+  save_path: OmniMod/Results/abnormal_new

@@ -102,6 +102,7 @@ def evaluate(args):
             audios = batch["audio"]
             instruction_input = batch["instruction_input"]
             ground_truth = batch["answer"]
+            text_questions = batch["question"]
             image_ids = batch["image_id"]
             texts = prepare_texts(instruction_input, conv_temp)
             predicts = model.generate(images=images,
@@ -111,12 +112,16 @@ def evaluate(args):
                                       temperature=temperature,
                                       top_p=top_p,
                                       do_sample=do_sample)
-            results.extend([{"image_id": image_id, "ground_truth": gt, "predict": predict} for image_id, gt, predict in zip(image_ids, ground_truth, predicts)])
+            results.extend([{"image_id": image_id, 'text_question': text_question ,"ground_truth": gt, "predict": predict} for image_id, text_question, gt, predict in zip(image_ids, text_questions, ground_truth, predicts)])
             # break
-    with open(os.path.join(cfg.run_cfg.save_path, "outputs_test.json"),"w") as jsonfile:
+
+    ckpt_path, ckpt_name = os.path.split(cfg.model_cfg.ckpt)
+    save_path = os.path.join(ckpt_path, 'result', f"Abnormal1_{ckpt_name.split('.')[0]}.json")
+    print(results)
+    with open(save_path,"w") as jsonfile:
         json.dump(results, jsonfile, ensure_ascii=False)
 
-    print('Saving the result in: ', os.path.join(cfg.run_cfg.save_path, "outputs_test.json"))
+    print('Saving the result in: ', save_path)
 
 if __name__ == "__main__":
     args = parse_args()
