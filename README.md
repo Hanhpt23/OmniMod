@@ -21,6 +21,9 @@ Our model integrates:
 - A language model: Mistral, Llama (2, 3, 3.1), Deepseek R1 (Distill Llama 8B) 
 - And a reasoning-aware fusion mechanism.
 
+Pretrained weights and datasets:
+- We released our checkpoint for SilvarMed [here](https://drive.google.com/file/d/1e7qGgr-AReFI7H9uSofmRZjMtXuD_tYq/view?usp=sharing).
+- Dataset [here]()
 ---
 
 
@@ -95,19 +98,23 @@ torchrun --nproc_per_node 2 --master_port=29501 evaluate.py \
 
 <div style="text-align: center;">
   <img src="images/dataset.png" alt="Dataset Image" width="400"/>
-  <p><i>Dataset Image.</i></p>
+  <p><i>Dataset labelling with medical image analysis specialist.</i></p>
 </div>
+
+
+
+---
 
 ## Experiments and Results
 
 <div style="text-align: center;">
   <img src="images/results.png" alt="Comparison of SilVar-Med with various text-based medical VLMs on the SLAKE and VQA-RAD datasets. Results are reported for both open-ended and closed-ended questions, with reference-based scores where applicable." width="800"/>
-  <p><i>Figure: Comparison of SilVar-Med with various text-based medical VLMs on the SLAKE and VQA-RAD datasets. Results are reported for both open-ended and closed-ended questions, with reference-based scores where applicable.</i></p>
+  <p><i>Comparison of SilVar-Med with various text-based medical VLMs on the SLAKE and VQA-RAD datasets. Results are reported for both open-ended and closed-ended questions, with reference-based scores where applicable.</i></p>
 </div>
 
 <div style="text-align: center;">
   <img src="images/prediction.png" alt="Comparison of prediction between our models and the other speech-driven model on the reasoning abnormal detection. Unlike GPT-4o and Gemini 1.5 Flash, our SilVar-Med is an end-to-end speech-driven VLM. For more demonstration, please visit." width="800"/>
-  <p><i>Figure: Comparison of prediction between our models and other speech-driven models on reasoning abnormal detection. Unlike GPT-4o and Gemini 1.5 Flash, our SilVar-Med is an end-to-end speech-driven VLM. For more demonstrations, please visit <a href="https://github.com/Hanhpt23/SilVarMed">our repository</a>.</i></p>
+  <p><i>Comparison of prediction between our models and other speech-driven models on reasoning abnormal detection. Unlike GPT-4o and Gemini 1.5 Flash, our SilVar-Med is an end-to-end speech-driven VLM. For more demonstrations, please visit <a href="https://github.com/Hanhpt23/SilVarMed">our repository</a>.</i></p>
 </div>
 
 ## Citation
