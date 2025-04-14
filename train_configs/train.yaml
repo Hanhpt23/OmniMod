@@ -7,19 +7,19 @@ model:
   vision_model: "biomed_clip"
   audio_model: "whisper"
   language_model: "meta-llama/Meta-Llama-3-8B"
-  ckpt: path/to/checkpoint
+  ckpt: ../Pretrain_weight/checkpoint_49.pth
   use_grad_checkpoint: True
   chat_template: True
   low_resource: True
   lora_r: 64
   lora_alpha: 16
   bits: 8
-  # freeze_vision: False For training end-to-end
-  # freeze_audio: False For training end-to-end
+  freeze_vision: True
+  freeze_audio: True
   
 datasets:
   audio_train:
-    batch_size: 4
+    batch_size: 2
     audio_processor: 
       train:
         name: 'whisper_processor'
@@ -32,9 +32,9 @@ datasets:
         name: "blip_caption"
     sample_ratio: 10
     build_info:
-      image_path: /train/images 
-      ann_path: /train/train.json
-      audio_path: /train/audio_wav
+      image_path: ../../MedTrinity-25M/Data/vqa-rad/vqa-rad/train/images
+      ann_path: ../../MedTrinity-25M/Data/vqa-rad/vqa-rad/train/train_new.json
+      audio_path: ../../MedTrinity-25M/Data/vqa-rad/vqa-rad/train/audios_wav
 
 run:
   task: image_text_pretrain
@@ -45,13 +45,13 @@ run:
   warmup_lr: 1e-6
 
   weight_decay: 0.05
-  max_epoch: 20
+  max_epoch: 1
   num_workers: 2
   warmup_steps: 1000
-  iters_per_epoch: 75
+  iters_per_epoch: 1
 
   seed: 42
-  output_dir: path/to/output/directory
+  output_dir: "Trail/vqa_rad"
 
   amp: True
   resume_ckpt_path: null
@@ -65,7 +65,7 @@ run:
   distributed: False
 
   wandb_log: True
-  wandb_token: "your-wandb-token"
-  job_name: OmniMod_audio
+  wandb_token: "e7134de62fe8b5b393083a97985006950575f545"
+  job_name: vqa_rad
 
 

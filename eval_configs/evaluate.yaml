@@ -7,7 +7,7 @@ model:
   language_model: meta-llama/Meta-Llama-3-8B
   vision_model: biomed_clip
   audio_model: whisper
-  ckpt: path/to/checkpoint
+  ckpt: OmniMod/Trail/vqa_rad/20241227174/checkpoint_0.pth
   use_grad_checkpoint: true
   chat_template: true
   low_resource: true
@@ -27,15 +27,15 @@ datasets:
       train:
         name: blip_caption
     build_info:
-      image_path: /train/images
-      ann_path: train/train.json
-      audio_path: /train/audio_wav
+      image_path: ../../MedTrinity-25M/Data/vqa-rad/vqa-rad/train/images
+      ann_path: ../../MedTrinity-25M/Data/vqa-rad/vqa-rad/train/train_new.json
+      audio_path: ../../MedTrinity-25M/Data/vqa-rad/vqa-rad/train/audios_wav
 evaluation_datasets:
   audio_val:
-    eval_file_path: /test/test.json
-    img_path: /test/images
+    eval_file_path: ../../MedTrinity-25M/Data/vqa-rad/vqa-rad/test/test_new.json
+    img_path: ../../MedTrinity-25M/Data/vqa-rad/vqa-rad/test/images
     prompt_test: ''
-    audio_path: /test/audio_wav
+    audio_path: ../../MedTrinity-25M/Data/vqa-rad/vqa-rad/test/audios_wav
     batch_size: 2
     max_new_tokens: 512
     temperature: 0.1
@@ -43,5 +43,5 @@ evaluation_datasets:
     do_sample: true
 run:
   task: image_text_pretrain
-  name: evaluation
-  save_path: path/to/output/directory
+  name: vqa_rad_evaluation
+  save_path: OmniMod/Trail/vqa_rad
