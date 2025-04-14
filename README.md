@@ -98,7 +98,7 @@ torchrun --nproc_per_node 2 --master_port=29501 evaluate.py \
   <p><i>Dataset Image.</i></p>
 </div>
 
-## Experiments and Results section
+## Experiments and Results
 
 <div style="text-align: center;">
   <img src="images/results.png" alt="Comparison of SilVar-Med with various text-based medical VLMs on the SLAKE and VQA-RAD datasets. Results are reported for both open-ended and closed-ended questions, with reference-based scores where applicable." width="800"/>
