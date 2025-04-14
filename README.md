@@ -1,9 +1,10 @@
 # SilVar-Med: A Speech-Driven Visual Language Model for Explainable Abnormality Detection in Medical Imaging
 
 <div style="text-align: center;">
-  <img src="images/images_architecture.png" alt="Speech-Driven Medical VLM" width="400"/>
+  <img src="images/images_architecture.png" alt="Speech-Driven Medical VLM" width="800"/>
   <p><i>Figure: SilVar-Med enables speech-based interaction with medical VLMs for abnormality detection and explanation.</i></p>
 </div>
+
 ---
 
 ## Overview and Contribution
