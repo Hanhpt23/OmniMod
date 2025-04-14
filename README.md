@@ -1,8 +1,9 @@
 # SilVar-Med: A Speech-Driven Visual Language Model for Explainable Abnormality Detection in Medical Imaging
 
-![Speech-Driven Medical VLM](images/images_architecture.pdf)  
-*Figure: SilVar-Med enables speech-based interaction with medical VLMs for abnormality detection and explanation.*
-
+<div style="text-align: center;">
+  <img src="images/images_architecture.png" alt="Speech-Driven Medical VLM" width="400"/>
+  <p><i>Figure: SilVar-Med enables speech-based interaction with medical VLMs for abnormality detection and explanation.</i></p>
+</div>
 ---
 
 ## Overview and Contribution
@@ -95,7 +96,7 @@ torchrun --nproc_per_node 2 --master_port=29501 evaluate.py \
 
 ## Experiments and Results section
 
-<img src="images/results.png" alt="Comparison of SilVar-Med with various text-based medical VLMs on the SLAKE and VQA-RAD datasets. Results are reported for both open-ended and closed-ended questions, with reference-based scores where applicable." width="400"/>
+<img src="images/resutls.png" alt="Comparison of SilVar-Med with various text-based medical VLMs on the SLAKE and VQA-RAD datasets. Results are reported for both open-ended and closed-ended questions, with reference-based scores where applicable." width="400"/>
 
 
 <img src="images/prediction.png" alt="Comparison of prediction between our models and the other speech-driven model on the reasoning abnormal detection. Unlike GPT-4o and Gemini 1.5 Flash, our SilVar-Med is an end-to-end speech-driven VLM. For more demonstration, please visit." width="400"/>
