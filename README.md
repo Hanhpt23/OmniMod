@@ -23,7 +23,7 @@ Our model integrates:
 
 Pretrained weights and datasets:
 - We released our checkpoint for SilvarMed [here](https://drive.google.com/file/d/1e7qGgr-AReFI7H9uSofmRZjMtXuD_tYq/view?usp=sharing).
-- Dataset [here]()
+- Dataset [here](https://huggingface.co/datasets/Hanhpt23/Silvar-Med)
 ---
 
 
@@ -120,10 +120,12 @@ torchrun --nproc_per_node 2 --master_port=29501 evaluate.py \
 ## Citation
 
 ```bibtex
-@article{pham2024silvar,
-  title={SilVar-Med: A Speech-Driven Visual Language Model for Explainable Abnormality Detection in Medical Imaging},
-  author={Tan-Hanh Pham, Chris Ngo, Trong-Duong Bui, Minh Luu Quang, Tan-Huong Pham, and Truong-Son Hy},
-  journal={arXiv preprint},
-  year={2025}
+@InProceedings{Pham_2025_CVPR,
+    author    = {Pham, Tan-Hanh and Bui, Trong-Duong and Quang, Minh Luu and Pham, Tan Huong and Ngo, Chris and Hy, Truong Son},
+    title     = {SilVar-Med: A Speech-Driven Visual Language Model for Explainable Abnormality Detection in Medical Imaging},
+    booktitle = {Proceedings of the Computer Vision and Pattern Recognition Conference (CVPR) Workshops},
+    month     = {June},
+    year      = {2025},
+    pages     = {2984-2994}
 }
 ```
