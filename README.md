@@ -1,10 +1,5 @@
 # Abstract Video Learning
 
-<div style="text-align: center;">
-  <img src="images/images_architecture.png" alt="Speech-Driven Medical VLM" width="800"/>
-  <p><i>Abstract Video Learning.</i></p>
-</div>
-
 ---
 
 ## Installation
