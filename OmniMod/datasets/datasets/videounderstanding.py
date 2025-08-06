@@ -121,6 +121,6 @@ class VideoDataset(Dataset):
                 audio_out = self.audio_processor(waveform.numpy())
                 audio = audio_out.squeeze()  # Should be [80, 3000]
                 output_data["audio"] = audio
-                print(f"Processed audio shape: {audio.shape}")
+                # print(f"Processed audio shape: {audio.shape}")
 
         return output_data

@@ -9,7 +9,6 @@ class VideoMAE(nn.Module):
         self.num_features = 768 
 
     def forward(self, video):
-        print('video.shape', video.shape)
         return self.model(video).last_hidden_state[:, 1:, :]
 
 def create_videomae(**kwargs):
@@ -17,6 +16,6 @@ def create_videomae(**kwargs):
     model = VideoMAE()
     if precision == "fp16":
         model = model.half()
-    print('Using VideoMAE')
+
     return model
 

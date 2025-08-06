@@ -8,6 +8,9 @@ from tqdm import tqdm
 from OmniMod.common.registry import registry
 from OmniMod.common.config import Config
 from OmniMod.conversation.conversation import Conversation, SeparatorStyle
+import torch
+
+torch.cuda.empty_cache()
 
 CONV_VISION = Conversation(
     system="",

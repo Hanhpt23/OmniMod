@@ -7,7 +7,7 @@ model:
   vision_model: "videomae"
   audio_model: "whisper"
   language_model: "meta-llama/Llama-3.2-1B"
-  ckpt: 
+  ckpt: OmniMod/VideoAudio/Debug/20250806165/checkpoint_0.pth
   use_grad_checkpoint: True
   chat_template: True
   low_resource: True
@@ -16,7 +16,7 @@ model:
   bits: 8
   freeze_vision: True
   freeze_audio: True
-  use_coconut: False  # Enable LatentReasoning reasoning
+  use_coconut: True  # Enable LatentReasoning reasoning
   use_multimodal_coconut: False  # Enable multimodal LatentReasoning (approach 2)
   num_latent_thoughts: 2  # Number of latent thoughts (n)
   coconut_discount_rate: 1.0  # discount/encourage rate (γ = 0.9 for discounting, γ = 1.1 for encouraging)

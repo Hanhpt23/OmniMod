@@ -448,11 +448,11 @@ class OmniModBase(BaseModel):
                         last_hidden = last_hidden * gamma
 
                         if self.use_multimodal_coconut:
-                            # print('Forward - LatentReasoning + MultiMix')
+                            print('Forward - LatentReasoning + MultiMix')
                             # Combine hidden state with mixed embeddings
                             thought_emb = self.multimodal_latent_attn(last_hidden, padded_mixed_embs)
                         else:
-                            # print('Forward - LatentReasoning')
+                            print('Forward - LatentReasoning')
                             thought_emb = last_hidden.unsqueeze(1)  # [batch_size, 1, hidden_dim]
                         # latent_embeds = torch.cat([latent_embeds, bot_embeds, thought_emb, eot_embeds], dim=1)
                         latent_embeds = torch.cat([latent_embeds, thought_emb], dim=1)
@@ -595,11 +595,11 @@ class OmniModBase(BaseModel):
                 last_hidden = last_hidden * gamma
 
                 if self.use_multimodal_coconut:
-                    # print('Generate - LatentReasoning + MultiMix')
+                    print('Generate - LatentReasoning + MultiMix')
                     # Combine hidden state with mixed embeddings
                     thought_emb = self.multimodal_latent_attn(last_hidden, padded_mixed_embs)
                 else:
-                    # print('Generate - LatentReasoning')
+                    print('Generate - LatentReasoning')
                     thought_emb = last_hidden.unsqueeze(1)
                 latent_embeds = torch.cat([latent_embeds, thought_emb], dim=1)
                 latent_attn_mask = torch.cat(
