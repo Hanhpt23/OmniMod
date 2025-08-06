@@ -1,31 +1,24 @@
 import logging
 import random
 import os
-
 import torch
 from torch.cuda.amp import autocast as autocast
 import torch.nn as nn
-from torch.nn import TransformerEncoder, TransformerEncoderLayer
-
 from OmniMod.common.registry import registry
 from OmniMod.models.base_model import disabled_train
 from OmniMod.models.OmniMod_base import OmniModBase
 
-IMG_DIM_VIT_LLAMA = 5632 # 1408 * 4
+IMG_DIM_VIT_LLAMA = 2048 #5632
 
 @registry.register_model("OmniMod")
 class OmniMod(OmniModBase):
-    """
-    OmniMod model
-    """
-
     PRETRAINED_MODEL_CONFIG_DICT = {
         "pretrain": "configs/models/OmniMod.yaml",
     }
 
     def __init__(
             self,
-            vision_model="eva_clip_g",
+            vision_model="videomae",
             audio_model="whisper",
             img_size=448,
             drop_path_rate=0,
@@ -45,8 +38,13 @@ class OmniMod(OmniModBase):
             chat_template=False,
             use_grad_checkpoint_llm=False,
             max_context_len=3800,
-            low_resource=False,  # use 8 bit and put vit in cpu
-            device_8bit=0,  # the device of 8bit model should be set when loading and cannot be changed anymore.
+            low_resource=False,
+            device_8bit=0,
+            use_coconut=False,
+            use_multimodal_coconut=False,
+            num_latent_thoughts=0,
+            coconut_discount_rate=1.0,
+
     ):
         super().__init__(
             vision_model=vision_model,
@@ -69,69 +67,56 @@ class OmniMod(OmniModBase):
             lora_target_modules=lora_target_modules,
             lora_alpha=lora_alpha,
             lora_dropout=lora_dropout,
+            use_coconut=use_coconut,
+            use_multimodal_coconut=use_multimodal_coconut,
+            num_latent_thoughts=num_latent_thoughts,
+            coconut_discount_rate=coconut_discount_rate,
         )
+        img_f_dim = self.visual_encoder.num_features * self.num_concat  # 768 * 4 = 3072
 
-        img_f_dim = self.visual_encoder.num_features * self.num_concat
-        if vision_model == "eva_clip_g" and "llama" in language_model: 
-            self.language_proj = nn.Linear(
-                img_f_dim, self.language_model.config.hidden_size
-            )
+        # self.vision_language_proj = nn.Linear(img_f_dim, self.language_model.config.hidden_size)  # 3072 → 2048
+        # self.audio_language_proj = nn.Linear(self.audio_encoder.d_model, self.language_model.config.hidden_size)  # 384 → 2048
+
+        if vision_model == "eva_clip_g" and "llama" in language_model:
+            self.vision_language_proj = nn.Linear(img_f_dim, self.language_model.config.hidden_size)
         else:
-            self.language_proj = nn.Sequential(
+            self.vision_language_proj = nn.Sequential(
                 nn.Linear(img_f_dim, IMG_DIM_VIT_LLAMA),
                 nn.GELU(),
-                nn.Linear(IMG_DIM_VIT_LLAMA, self.language_model.config.hidden_size)
+                nn.Linear(IMG_DIM_VIT_LLAMA, self.language_model.config.hidden_size)  # hidden_size = 2048
             )
-        '''Original layer: 1 Linear layer'''
-        # self.audio_language_proj = nn.Linear(self.audio_encoder.d_model, self.language_model.config.hidden_size)
-
-        '''Testing: 2 Linear layers'''
         self.audio_language_proj = nn.Sequential(
             nn.Linear(self.audio_encoder.d_model, IMG_DIM_VIT_LLAMA),
             nn.GELU(),
             nn.Linear(IMG_DIM_VIT_LLAMA, self.language_model.config.hidden_size)
         )
-
-        '''Transformer adapter '''
-        # transformer_encoder_layer = nn.TransformerEncoderLayer(
-        #                                 d_model=self.audio_encoder.d_model,  
-        #                                 nhead=8,  # Number of attention heads
-        #                                 dim_feedforward=int(IMG_DIM_VIT_LLAMA/2),  
-        #                                 dropout=0.1  )
-        # self.audio_transformer_encoder = nn.TransformerEncoder(
-        #                                     transformer_encoder_layer,
-        #                                     num_layers=2)
-        # self.audio_language_proj = nn.Sequential(
-        #                     self.audio_transformer_encoder,
-        #                     nn.Linear(self.audio_encoder.d_model, self.language_model.config.hidden_size))
-
         self.chat_template = chat_template
-
         if use_grad_checkpoint_llm:
             self.language_model.gradient_checkpointing_enable()
 
     def encode_img(self, image):
         device = image.device
-
-        if len(image.shape) > 4:
-            image = image.reshape(-1, *image.shape[-3:])
-
+        # print('input size: ', image.shape)  # [batch_size, frame, 3, 224, 224]
         with self.maybe_autocast():
-            image_embeds = self.ln_vision(self.visual_encoder(image)).to(device)
-            # image_embeds = image_embeds[:, 1:, :]
+            image_embeds = self.visual_encoder(image)
+            # print('image_embeds before LN: ', image_embeds.shape)  # [batch_size, 1568, 768]
+            image_embeds = self.ln_vision(image_embeds).to(device)
+            # print('image_embeds after LN: ', image_embeds.shape)  # [batch_size, 1568, 768]
             bs, pn, hs = image_embeds.shape
-            image_embeds = image_embeds.view(bs, int(pn / self.num_concat), int(hs * self.num_concat))
-
-            inputs_language = self.language_proj(image_embeds)
-            atts_language = torch.ones(inputs_language.size()[:-1], dtype=torch.long).to(image.device)
+            if self.num_concat != 1:
+                if pn % self.num_concat != 0:
+                    raise ValueError(f"Sequence length {pn} not divisible by num_concat {self.num_concat}")
+                image_embeds = image_embeds.view(bs, int(pn / self.num_concat), int(hs * self.num_concat))
+            inputs_language = self.vision_language_proj(image_embeds)
+            atts_language = torch.ones(inputs_language.size()[:-1], dtype=torch.long).to(device)
+        # print('inputs_language: ', inputs_language.shape)  # [batch_size, 392, 2048]
+        # print('atts_language: ', atts_language.shape)  # [batch_size, 392]
         return inputs_language, atts_language
-    
+
     def encode_audio(self, audio):
         device = audio.device
-
         with self.maybe_autocast():
             audio_embeds = self.audio_encoder(audio).to(device)
-
             inputs_audio = self.audio_language_proj(audio_embeds)
             atts_audio = torch.ones(inputs_audio.size()[:-1], dtype=torch.long).to(audio.device)
         return inputs_audio, atts_audio
@@ -142,25 +127,25 @@ class OmniMod(OmniModBase):
         audio_model = cfg.get("audio_model", "whisper")
         img_size = cfg.get("image_size")
         language_model = cfg.get("language_model")
-
         drop_path_rate = cfg.get("drop_path_rate", 0)
         use_grad_checkpoint = cfg.get("use_grad_checkpoint", False)
         precision = cfg.get("precision", "fp16")
         freeze_vision = cfg.get("freeze_vision", True)
         freeze_audio = cfg.get("freeze_audio", True)
         low_resource = cfg.get("low_resource", False)
-
         prompt_template = cfg.get("prompt_template", '[INST] {} [/INST]')
         max_txt_len = cfg.get("max_txt_len", 300)
         end_sym = cfg.get("end_sym", '\n')
-
         bits = cfg.get("bits", 8)
         lora_r = cfg.get("lora_r", 64)
         lora_alpha = cfg.get("lora_alpha", 16)
         chat_template = cfg.get("chat_template", False)
-
         use_grad_checkpoint_llm = cfg.get("use_grad_checkpoint_llm", False)
         max_context_len = cfg.get("max_context_len", 3800)
+        use_coconut=cfg.get("use_coconut", False)
+        use_multimodal_coconut=cfg.get("use_multimodal_coconut", False)
+        num_latent_thoughts=cfg.get("num_latent_thoughts", 2)
+        coconut_discount_rate=cfg.get("coconut_discount_rate", 1)
 
         model = cls(
             vision_model=vision_model,
@@ -182,27 +167,16 @@ class OmniMod(OmniModBase):
             chat_template=chat_template,
             use_grad_checkpoint_llm=use_grad_checkpoint_llm,
             max_context_len=max_context_len,
+            use_coconut=use_coconut,
+            use_multimodal_coconut=use_multimodal_coconut,
+            num_latent_thoughts=num_latent_thoughts,
+            coconut_discount_rate=coconut_discount_rate,
         )
 
-        ckpt_path = cfg.get("ckpt", "")  # load weights of MiniGPT-4
+        ckpt_path = cfg.get("ckpt", "")
         if ckpt_path:
             print("Load Model Checkpoint: {}".format(ckpt_path))
             ckpt = torch.load(ckpt_path, map_location="cpu")
             msg = model.load_state_dict(ckpt['model'], strict=False)
-
-            if os.path.basename(ckpt_path) == "checkpoint_stage3.pth" and "llama" in language_model:
-                with torch.no_grad():
-                    for name, param in model.named_parameters():
-                        name = name.replace("language_model", "llama_model")
-                        name = name.replace("default.", "")
-                        if ckpt['model'].get(name, None) is not None:
-                            param.copy_(ckpt['model'][name])
-                            
-                    if vision_model == "eva_clip_g":
-                        model.language_proj.weight.copy_(ckpt['model']['llama_proj.weight'])
-                        model.language_proj.bias.copy_(ckpt['model']['llama_proj.bias'])
-                    else:
-                        model.language_proj[-1].weight.copy_(ckpt['model']['llama_proj.weight'])
-                        model.language_proj[-1].bias.copy_(ckpt['model']['llama_proj.bias'])
 
         return model
