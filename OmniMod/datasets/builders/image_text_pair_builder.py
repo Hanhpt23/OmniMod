@@ -21,7 +21,38 @@ from OmniMod.datasets.datasets.coco_caption import COCOCapDataset
 from OmniMod.datasets.datasets.vindrcxr_dataset import VinDrCXRDataset
 from OmniMod.datasets.datasets.audio_instruction import AudioInstruction
 
+from OmniMod.datasets.datasets.videounderstanding import VideoDataset
 
+
+@registry.register_builder("audiovideo_train")
+class VideoAudioInstructionBuilder(BaseDatasetBuilder):
+    train_dataset_cls = VideoDataset
+    eval_dataset_cls = VideoDataset
+    DATASET_CONFIG_DICT = {
+        "default": "configs/datasets/audiovideo_instruction/default.yaml",
+    }
+
+    def build_datasets(self):
+        # at this point, all the annotations and image/videos should be all downloaded to the specified locations.
+        logging.info("Building datasets...")
+        self.build_processors()
+        build_info = self.config.build_info
+        datasets = dict()
+
+        # create datasets
+        dataset_cls = self.train_dataset_cls
+        datasets["train"] = dataset_cls(
+            vis_processor=self.vis_processors["train"],
+            text_processor=self.text_processors["train"],
+            audio_processor=self.audio_processors["train"],
+            audio_dir=build_info.audio_path,
+            ann_path=build_info.ann_path,
+            video_root=build_info.image_path,
+        )
+
+        return datasets
+
+    
 @registry.register_builder("audio_train")
 class AudioInstructionBuilder(BaseDatasetBuilder):
     train_dataset_cls = AudioInstruction

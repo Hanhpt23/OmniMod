@@ -14,7 +14,6 @@ from omegaconf import OmegaConf
 from torchvision import transforms
 from torchvision.transforms.functional import InterpolationMode
 
-
 class BlipImageBaseProcessor(BaseProcessor):
     def __init__(self, mean=None, std=None):
         if mean is None:

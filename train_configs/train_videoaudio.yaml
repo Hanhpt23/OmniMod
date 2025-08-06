@@ -1,0 +1,76 @@
+model:
+  arch: OmniMod
+  model_type: pretrain
+  max_txt_len: 1024
+  image_size: 224
+  end_sym: "</s>"
+  vision_model: "videomae"
+  audio_model: "whisper"
+  language_model: "meta-llama/Llama-3.2-1B"
+  ckpt: 
+  use_grad_checkpoint: True
+  chat_template: True
+  low_resource: True
+  lora_r: 64
+  lora_alpha: 16
+  bits: 8
+  freeze_vision: True
+  freeze_audio: True
+  use_coconut: False  # Enable LatentReasoning reasoning
+  use_multimodal_coconut: False  # Enable multimodal LatentReasoning (approach 2)
+  num_latent_thoughts: 2  # Number of latent thoughts (n)
+  coconut_discount_rate: 1.0  # discount/encourage rate (γ = 0.9 for discounting, γ = 1.1 for encouraging)
+
+
+datasets:
+  audiovideo_train:
+    batch_size: 2
+    audio_processor: 
+      train:
+        name: 'whisper_processor'
+    vis_processor:
+      train:
+        name: 'videomae_processor'
+        image_size: 224
+    text_processor:
+      train:
+        name: "blip_caption"
+    sample_ratio: 10
+    build_info:
+      image_path: ../../datasets/vggsound_train_videos
+      ann_path: ../../datasets/vggsound_train.json
+      audio_path: ../../datasets/vggsound_train_audios
+
+run:
+  task: image_text_pretrain
+  # optimizer
+  lr_sched: "linear_warmup_cosine_lr"
+  init_lr: 1e-5
+  min_lr: 1e-6
+  warmup_lr: 1e-6
+
+  weight_decay: 0.05
+  max_epoch: 1
+  num_workers: 2
+  warmup_steps: 1000
+  iters_per_epoch: 1
+
+  seed: 42
+  output_dir: "VideoAudio/Debug"
+
+  amp: True
+  resume_ckpt_path: null
+
+  evaluate: False 
+  train_splits: ["train"]
+
+  device: "cuda"
+  world_size: 1
+  dist_url: "env://"
+  distributed: False
+
+  wandb_log: True
+  wandb_token: "e7134de62fe8b5b393083a97985006950575f545"
+  job_name: Debug
+
+

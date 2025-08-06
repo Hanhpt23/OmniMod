@@ -1,0 +1,7 @@
+datasets:
+  audiovideo_train:
+    data_type: images
+    build_info:
+      image_path: ../data/MMMU_normal/train/images 
+      ann_path: ../data/MMMU_normal/train/train.json
+      audio_path: ../data/MMMU_normal/train/audio_wav

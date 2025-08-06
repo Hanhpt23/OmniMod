@@ -12,6 +12,7 @@ from OmniMod.processors.blip_processors import (
     BlipCaptionProcessor,
 )
 from OmniMod.processors.whisper_processors import WhisperAudioProcessor
+from OmniMod.processors.video_processors import VideoProcessor
 
 from OmniMod.common.registry import registry
 
@@ -21,6 +22,7 @@ __all__ = [
     "Blip2ImageEvalProcessor",
     "BlipCaptionProcessor",
     'WhisperAudioProcessor',
+    'VideoProcessor',
 ]
 
 

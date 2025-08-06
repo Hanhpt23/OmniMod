@@ -3,6 +3,8 @@ from .clip_vit import create_pubmed_clip_vit
 from .biomed_clip import create_biomed_clip
 from .biomed_pubmed_clip import create_biomed_pubmed_clip
 from .clip import create_clip
+from .videomae import create_videomae
+
 
 def build_vision_encoder(vision_model, **kwargs):
     if vision_model == "eva_clip_g":
@@ -29,3 +31,10 @@ def build_vision_encoder(vision_model, **kwargs):
         assert img_size == 224, "The resolution of the image must be (224, 224)"
         num_concat = 4
         return create_clip(**kwargs), num_concat
+    
+    if vision_model == "videomae":
+        img_size = kwargs["img_size"]
+        assert img_size == 224, "The resolution of the image must be (224, 224)"
+        num_concat = 1
+        print('using videomae')
+        return create_videomae(**kwargs), num_concat

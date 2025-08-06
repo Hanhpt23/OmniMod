@@ -92,14 +92,35 @@ class VideoDataset(Dataset):
             "instruction_input": instruction
         }
 
+        # # Load audio (optional)
+        # if self.audio_dir:
+        #     audio_path = os.path.join(self.audio_dir, f'{video_id}.wav')
+        #     if os.path.exists(audio_path):
+        #         waveform, sample_rate = torchaudio.load(audio_path)
+        #         audio_out = self.audio_processor(waveform.squeeze().numpy())
+        #         audio = audio_out.squeeze()
+        #         output_data["audio"] = audio
+
+        # print('video.squeeze(0): ', video.squeeze(0).shape, audio.shape)
+
+        # return output_data
+
+
         # Load audio (optional)
         if self.audio_dir:
             audio_path = os.path.join(self.audio_dir, f'{video_id}.wav')
             if os.path.exists(audio_path):
                 waveform, sample_rate = torchaudio.load(audio_path)
-                audio_out = self.audio_processor(waveform.squeeze().numpy())
-                audio = audio_out.squeeze()
+                # Ensure waveform is 1D (mono) and resample to 16kHz if needed
+                if waveform.dim() > 1:
+                    waveform = waveform.mean(dim=0, keepdim=False)  # Convert to mono
+                if sample_rate != 16000:
+                    resampler = torchaudio.transforms.Resample(sample_rate, 16000)
+                    waveform = resampler(waveform)
+                # Process audio with whisper_processor
+                audio_out = self.audio_processor(waveform.numpy())
+                audio = audio_out.squeeze()  # Should be [80, 3000]
                 output_data["audio"] = audio
+                print(f"Processed audio shape: {audio.shape}")
 
         return output_data
-
