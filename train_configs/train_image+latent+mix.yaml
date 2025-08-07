@@ -4,7 +4,7 @@ model:
   max_txt_len: 1024
   image_size: 224
   end_sym: "</s>"
-  vision_model: "videomae"
+  vision_model: "clip"
   audio_model: "whisper"
   language_model: "meta-llama/Llama-3.2-1B"
   ckpt: 
@@ -17,29 +17,29 @@ model:
   freeze_vision: True
   freeze_audio: True
   use_coconut: True  # Enable LatentReasoning reasoning
-  use_multimodal_coconut: False  # Enable multimodal LatentReasoning (approach 2)
+  use_multimodal_coconut: True  # Enable multimodal LatentReasoning (approach 2)
   num_latent_thoughts: 1  # Number of latent thoughts (n)
   coconut_discount_rate: 1.0  # discount/encourage rate (γ = 0.9 for discounting, γ = 1.1 for encouraging)
 
 
 datasets:
-  audiovideo_train:
-    batch_size: 2
+  image_train:
+    batch_size: 4
     audio_processor: 
       train:
         name: 'whisper_processor'
     vis_processor:
       train:
-        name: 'videomae_processor'
+        name: 'blip2_image_train'
         image_size: 224
     text_processor:
       train:
         name: "blip_caption"
     sample_ratio: 10
     build_info:
-      image_path: ../../datasets/VGGSound/vggsound_train_videos
-      ann_path: ../../datasets/VGGSound/vggsound_train.json
-      audio_path: None #../../datasets/VGGSound/vggsound_train_audios
+      image_path: ../../datasets_image/ScienceQA/images
+      ann_path: ../../datasets_image/ScienceQA/scienceqa_train.json
+      audio_path: None
 
 run:
   task: image_text_pretrain
@@ -50,13 +50,13 @@ run:
   warmup_lr: 1e-6
 
   weight_decay: 0.05
-  max_epoch: 1
+  max_epoch: 5
   num_workers: 2
-  warmup_steps: 1000
-  iters_per_epoch: 1
+  warmup_steps: 200
+  iters_per_epoch: 1555 # total sample 6218/4 (batch size)
 
   seed: 42
-  output_dir: "VideoAudio/Debug"
+  output_dir: "ImageFuse/LatentScienceQAMix"
 
   amp: True
   resume_ckpt_path: null
@@ -71,6 +71,4 @@ run:
 
   wandb_log: True
   wandb_token: "e7134de62fe8b5b393083a97985006950575f545"
-  job_name: Debug
-
-
+  job_name: LatentScienceQAMix
