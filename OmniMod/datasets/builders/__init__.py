@@ -11,7 +11,8 @@ from OmniMod.datasets.builders.image_text_pair_builder import (
     LaionBuilder,
     CCSBUAlignBuilder,
     VideoAudioInstructionBuilder,
-    AudioInstructionBuilder
+    AudioInstructionBuilder,
+    ImageInstructionBuilder
 
 )
 from OmniMod.common.registry import registry
@@ -22,6 +23,7 @@ __all__ = [
     "CCSBUAlignBuilder",
     "VideoAudioInstructionBuilder",
     "AudioInstructionBuilder",
+    'ImageInstructionBuilder',
 
 ]
 

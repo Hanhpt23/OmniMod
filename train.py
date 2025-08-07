@@ -42,7 +42,7 @@ def parse_args():
 
     parser.add_argument("--cfg-path", required=True, help="path to train configuration file.")
     parser.add_argument("--cfg-eval-path", required=False, help="path to evaluation configuration file.")
-    parser.add_argument("--eval-dataset", type=list_of_str, default='val_vindrcxr', help="dataset to evaluate")
+    parser.add_argument("--eval-dataset", type=list_of_str, default='video_val', help="dataset to evaluate")
     parser.add_argument(
         "--options",
         nargs="+",

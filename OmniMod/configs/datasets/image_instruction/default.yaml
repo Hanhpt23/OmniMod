@@ -1,0 +1,7 @@
+datasets:
+  image_train:
+    data_type: images
+    build_info:
+      image_path: ../../datasets_image/trial/images
+      ann_path: ../../datasets_image/trial/trial.json
+      audio_path: None

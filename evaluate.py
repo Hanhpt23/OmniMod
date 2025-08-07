@@ -3,6 +3,7 @@ import argparse
 import json
 import logging
 from OmniMod.datasets.datasets.videounderstanding import VideoDataset
+from OmniMod.datasets.datasets.imageunderstanding import ImageDataset
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from OmniMod.common.registry import registry
@@ -56,11 +57,11 @@ def init_model(cfg):
     text_processor = registry.get_processor_class(text_processor_cfg.name).from_config(text_processor_cfg)
     audio_processor = registry.get_processor_class(audio_processor_cfg.name).from_config(audio_processor_cfg)
     logging.info('Initialization Finished')
-    return model, vis_processor, text_processor, audio_processor
+    return model, vis_processor, text_processor, audio_processor, vis_processor_cfg.name
 
 def evaluate(args):
     cfg = Config(args)
-    model, vis_processor, text_processor, audio_processor = init_model(cfg)
+    model, vis_processor, text_processor, audio_processor, vis_processor_name = init_model(cfg)
     model.eval()
     conv_temp = CONV_VISION.copy()
 
@@ -75,14 +76,26 @@ def evaluate(args):
         do_sample = cfg.evaluation_datasets_cfg[dataset]["do_sample"]
         audio_path = cfg.evaluation_datasets_cfg[dataset]["audio_path"]
 
-        data = VideoDataset(
-            vis_processor=vis_processor,
-            text_processor=text_processor,
-            audio_processor=audio_processor,
-            audio_dir=audio_path,
-            ann_path=eval_file_path,
-            video_root=img_path
-        )
+        if vis_processor_name == 'blip2_image_eval':
+            data = ImageDataset(
+                vis_processor=vis_processor,
+                text_processor=text_processor,
+                audio_processor=audio_processor,
+                audio_dir=audio_path,
+                ann_path=eval_file_path,
+                image_root=img_path
+            )
+        elif vis_processor_name == 'videomae_processor':
+            data = VideoDataset(
+                vis_processor=vis_processor,
+                text_processor=text_processor,
+                audio_processor=audio_processor,
+                audio_dir=audio_path,
+                ann_path=eval_file_path,
+                video_root=img_path
+            )
+        else:
+            raise RuntimeError(f"Can not find suitable vision processor for the vision input type!")
         
         eval_dataloader = DataLoader(data, batch_size=batch_size, shuffle=False)
         results = []

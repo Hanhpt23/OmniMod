@@ -99,18 +99,24 @@ class OmniMod(OmniModBase):
         # print('input size: ', image.shape)  # [batch_size, frame, 3, 224, 224]
         with self.maybe_autocast():
             image_embeds = self.visual_encoder(image)
-            # print('image_embeds before LN: ', image_embeds.shape)  # [batch_size, 1568, 768]
-            image_embeds = self.ln_vision(image_embeds).to(device)
-            # print('image_embeds after LN: ', image_embeds.shape)  # [batch_size, 1568, 768]
+
+            image_embeds = self.ln_vision(image_embeds).to(device) # [batch_size, 1568 or 1567, 768]
+            # print('image_embeds: ', image_embeds.shape)
+
             bs, pn, hs = image_embeds.shape
             if self.num_concat != 1:
                 if pn % self.num_concat != 0:
-                    raise ValueError(f"Sequence length {pn} not divisible by num_concat {self.num_concat}")
+                    pad_len = (self.num_concat - (pn % self.num_concat)) % self.num_concat
+
+                    pad = torch.zeros(bs, pad_len, hs, device=image_embeds.device, dtype=image_embeds.dtype)
+                    image_embeds = torch.cat([pad, image_embeds], dim=1)
+                    pn = pn + pad_len  # update pn after padding
+
+                    # raise ValueError(f"Sequence length {pn} not divisible by num_concat {self.num_concat}")
                 image_embeds = image_embeds.view(bs, int(pn / self.num_concat), int(hs * self.num_concat))
             inputs_language = self.vision_language_proj(image_embeds)
             atts_language = torch.ones(inputs_language.size()[:-1], dtype=torch.long).to(device)
-        # print('inputs_language: ', inputs_language.shape)  # [batch_size, 392, 2048]
-        # print('atts_language: ', atts_language.shape)  # [batch_size, 392]
+
         return inputs_language, atts_language
 
     def encode_audio(self, audio):

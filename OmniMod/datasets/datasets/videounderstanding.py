@@ -75,12 +75,12 @@ class VideoDataset(Dataset):
         info = self.ann[index]
         video_name = info['video_name']
         video_id = os.path.splitext(video_name)[0]
-        action = info['answer']
+
         video_path = os.path.join(self.video_root, video_name)
 
         video = self.preprocess_video_clip_videomae(video_path, clip_len=16)
 
-        caption = info['answer']
+        answer = info['answer']
         question = info['question']
         instruction = f"<VideoHere>Please analyze step by step: {question}"
 
@@ -88,7 +88,7 @@ class VideoDataset(Dataset):
             "image_id": video_id,
             "image": video.squeeze(0), # Shape: [16, 3, 224, 224]
             "question": question,
-            "answer": caption,
+            "answer": answer,
             "instruction_input": instruction
         }
 
