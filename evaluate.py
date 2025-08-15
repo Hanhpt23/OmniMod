@@ -76,7 +76,7 @@ def evaluate(args):
         do_sample = cfg.evaluation_datasets_cfg[dataset]["do_sample"]
         audio_path = cfg.evaluation_datasets_cfg[dataset]["audio_path"]
 
-        if vis_processor_name == 'blip2_image_eval':
+        if vis_processor_name == 'blip2_image_eval' or vis_processor_name == 'blip2_image_train':
             data = ImageDataset(
                 vis_processor=vis_processor,
                 text_processor=text_processor,
@@ -123,7 +123,7 @@ def evaluate(args):
                 "predict": predict
             } for image_id, text_question, gt, predict in zip(image_ids, text_questions, ground_truth, predicts)])
             logging.info(f"evaluate: predicts: {predicts[:2]}")
-            break
+            # break
 
         ckpt_path, ckpt_name = os.path.split(cfg.model_cfg.ckpt)
         save_path = os.path.join(ckpt_path, 'result', f"output_{ckpt_name.split('.')[0]}.json")

@@ -8,7 +8,7 @@ from OmniMod.common.registry import registry
 from OmniMod.models.base_model import disabled_train
 from OmniMod.models.OmniMod_base import OmniModBase
 
-IMG_DIM_VIT_LLAMA = 2048 #5632
+IMG_DIM_VIT_LLAMA = 2048 #2048 # 2048 for 3.2 1B | 4096 for Llama 3.1 8B
 
 @registry.register_model("OmniMod")
 class OmniMod(OmniModBase):
@@ -44,6 +44,7 @@ class OmniMod(OmniModBase):
             use_multimodal_coconut=False,
             num_latent_thoughts=0,
             coconut_discount_rate=1.0,
+            mu=0.3, # Weight auxiliary loss
 
     ):
         super().__init__(
@@ -71,6 +72,7 @@ class OmniMod(OmniModBase):
             use_multimodal_coconut=use_multimodal_coconut,
             num_latent_thoughts=num_latent_thoughts,
             coconut_discount_rate=coconut_discount_rate,
+            mu=mu
         )
         img_f_dim = self.visual_encoder.num_features * self.num_concat  # 768 * 4 = 3072
 
@@ -152,6 +154,7 @@ class OmniMod(OmniModBase):
         use_multimodal_coconut=cfg.get("use_multimodal_coconut", False)
         num_latent_thoughts=cfg.get("num_latent_thoughts", 2)
         coconut_discount_rate=cfg.get("coconut_discount_rate", 1)
+        mu=cfg.get("mu",0.3)
 
         model = cls(
             vision_model=vision_model,
@@ -177,6 +180,7 @@ class OmniMod(OmniModBase):
             use_multimodal_coconut=use_multimodal_coconut,
             num_latent_thoughts=num_latent_thoughts,
             coconut_discount_rate=coconut_discount_rate,
+            mu=mu,
         )
 
         ckpt_path = cfg.get("ckpt", "")

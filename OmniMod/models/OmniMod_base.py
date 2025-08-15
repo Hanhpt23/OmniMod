@@ -9,7 +9,7 @@ import torch.nn as nn
 from OmniMod.common.registry import registry
 from OmniMod.models.base_model import BaseModel
 from transformers import StoppingCriteria, StoppingCriteriaList
-
+from torch.nn import GRU  # Or small TransformerBlock for recurrence
 from OmniMod.conversation.conversation import StoppingCriteriaSub
 
 # Configure logging
@@ -44,6 +44,7 @@ class MultimodalLatentAttention(nn.Module):
         self.attn = nn.MultiheadAttention(embed_dim=mixed_dim, num_heads=num_heads)
         self.norm = nn.LayerNorm(mixed_dim)
         self.proj_back = nn.Linear(mixed_dim, llm_hidden_dim)
+        self.final_norm = nn.LayerNorm(llm_hidden_dim)
     
     def forward(self, hidden_state, mixed_embeds):
         batch_size = hidden_state.size(0)
@@ -51,9 +52,13 @@ class MultimodalLatentAttention(nn.Module):
         with torch.cuda.amp.autocast(enabled=True):
             query = self.proj(hidden_state.to(self.proj.weight.dtype)).unsqueeze(0)  # [1, batch_size, mixed_dim]
             key_value = mixed_embeds.transpose(0, 1)  # [seq_len, batch_size, mixed_dim]
-            attn_output, _ = self.attn(query, key_value, key_value)
+            attn_output, attn_weights = self.attn(query, key_value, key_value)
+            # logger.info(f"Attention weights mean: {attn_weights.mean().item()}, std: {attn_weights.std().item()}")
+
             attn_output = self.norm(attn_output + query)
             output = self.proj_back(attn_output.squeeze(0))  # [batch_size, hidden_dim]
+            output = self.final_norm(output)  # Apply final normalization
+
         return output.unsqueeze(1)  # [batch_size, 1, hidden_dim]
 
 
@@ -88,6 +93,7 @@ class OmniModBase(BaseModel):
         use_multimodal_coconut=False,  # Enable multimodal LatentReasoning (approach 2)
         num_latent_thoughts=2,  # Number of latent thoughts (n)
         coconut_discount_rate=1.0,  # discount/encourage rate (γ = 0.9 for discounting, γ = 1.1 for encouraging)
+        mu=0.3,
     ):
         super().__init__()
 
@@ -107,6 +113,7 @@ class OmniModBase(BaseModel):
         self.num_latent_thoughts = num_latent_thoughts
         self.use_multimodal_coconut = use_multimodal_coconut
         self.coconut_discount_rate = coconut_discount_rate  # Store discount/encourage rate
+        self.mu = mu # Weight auxiliary loss
 
         # if self.use_coconut:
         #     self.language_tokenizer.add_special_tokens({
@@ -132,16 +139,15 @@ class OmniModBase(BaseModel):
             freeze_audio,
             precision=precision
         )
-
+        DIM = self.language_model.config.hidden_size # 2048 for 3.2 1B | 4096 for Llama-3.1-8B-Instruct
         # Initialize attention-based mixer for video and audio embedding
-        self.cross_modal_attn = CrossModalAttention(dim=2048, num_heads=8)
+        self.cross_modal_attn = CrossModalAttention(dim=DIM, num_heads=8)
         
         # Initialize multimodal latent attention for approach 2
         if self.use_multimodal_coconut:
-            self.llm_hidden_dim = self.language_model.config.hidden_size # 2048
+            self.llm_hidden_dim = self.language_model.config.hidden_size 
             self.multimodal_latent_attn = MultimodalLatentAttention(
-                llm_hidden_dim=self.llm_hidden_dim, mixed_dim=2048, num_heads=8
-            )
+                llm_hidden_dim=self.llm_hidden_dim, mixed_dim=DIM, num_heads=8)
 
         self.precision = precision
         self.max_txt_len = max_txt_len
@@ -209,6 +215,9 @@ class OmniModBase(BaseModel):
         batch_size = len(flat_mixed_embs)
         device = flat_mixed_embs[0].device
         mixed_dim = flat_mixed_embs[0].shape[2]
+        
+        # logger.info(f"Padding mixed_embs: batch_size={batch_size}, max_seq_len={max_seq_len}, mixed_dim={mixed_dim}")
+
         padded_embs = torch.zeros(batch_size, max_seq_len, mixed_dim, dtype=flat_mixed_embs[0].dtype, device=device)
         for i, emb in enumerate(flat_mixed_embs):
             seq_len = emb.shape[1]
@@ -448,11 +457,11 @@ class OmniModBase(BaseModel):
                         last_hidden = last_hidden * gamma
 
                         if self.use_multimodal_coconut:
-                            print('Forward - LatentReasoning + MultiMix')
+                            # print('Forward - LatentReasoning + MultiMix')
                             # Combine hidden state with mixed embeddings
                             thought_emb = self.multimodal_latent_attn(last_hidden, padded_mixed_embs)
                         else:
-                            print('Forward - LatentReasoning')
+                            # print('Forward - LatentReasoning')
                             thought_emb = last_hidden.unsqueeze(1)  # [batch_size, 1, hidden_dim]
                         # latent_embeds = torch.cat([latent_embeds, bot_embeds, thought_emb, eot_embeds], dim=1)
                         latent_embeds = torch.cat([latent_embeds, thought_emb], dim=1)
@@ -465,6 +474,11 @@ class OmniModBase(BaseModel):
                             [latent_targets, torch.ones([batch_size, 1], dtype=torch.long, device=self.device) * -100],
                             dim=1
                         )
+
+                        # Add auxiliary loss for intermediate thoughts
+                        aux_outputs = self.language_model(inputs_embeds=latent_embeds, attention_mask=latent_attention_mask, return_dict=True, labels=latent_targets)
+                        # logger.info(f"aux_outputs: {aux_outputs.loss}")
+                        total_loss += aux_outputs.loss * self.mu #0.3  # Weight auxiliary loss
 
                     else:
                         # Final language mode: compute loss
@@ -595,11 +609,11 @@ class OmniModBase(BaseModel):
                 last_hidden = last_hidden * gamma
 
                 if self.use_multimodal_coconut:
-                    print('Generate - LatentReasoning + MultiMix')
+                    # print('Generate - LatentReasoning + MultiMix')
                     # Combine hidden state with mixed embeddings
                     thought_emb = self.multimodal_latent_attn(last_hidden, padded_mixed_embs)
                 else:
-                    print('Generate - LatentReasoning')
+                    # print('Generate - LatentReasoning')
                     thought_emb = last_hidden.unsqueeze(1)
                 latent_embeds = torch.cat([latent_embeds, thought_emb], dim=1)
                 latent_attn_mask = torch.cat(

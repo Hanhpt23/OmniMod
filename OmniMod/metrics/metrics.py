@@ -69,14 +69,40 @@ def main():
     # File path to the JSON data
     # file_path = 'OmniMod/ImageFuse/NormalScienceQA/20250808083/result/output_checkpoint_4.json' # 5 epochs
     # file_path = 'OmniMod/ImageFuse/NormalScienceQA/20250808133/result/output_checkpoint_4.json' # 10 epochs use weight from 20250808083
-    file_path = 'OmniMod/ImageFuse/NormalScienceQA/20250808190/result/output_checkpoint_4.json' # use the 2epoch weight from VQAv2
+    # file_path = 'OmniMod/ImageFuse/NormalScienceQA/20250808190/result/output_checkpoint_4.json' # use the 2epoch weight from VQAv2
 
     # file_path = 'OmniMod/ImageFuse/LatentScienceQA/20250808092/result/output_checkpoint_4.json' # Train coconut test without coconut
     # file_path = 'OmniMod/ImageFuse/LatentScienceQA/20250808131/result/output_checkpoint_7.json'
+    # file_path = 'OmniMod/ImageFuse/LatentScienceQA/20250808213/result/output_checkpoint_19.json'
+    # file_path = 'OmniMod/ImageFuse/LatentScienceQA/20250809120/result/output_checkpoint_4.json'
+    # file_path = 'OmniMod/ImageFuse/LatentScienceQA/20250810175/result/output_checkpoint_9.json'
+
+    
     # file_path = 'OmniMod/ImageFuse/LatentScienceQAMix/20250808111/result/output_checkpoint_4.json'
     # file_path = 'OmniMod/ImageFuse/LatentScienceQAMix/20250808111/result/output_checkpoint_4.json'
+    # file_path = 'OmniMod/ImageFuse/LatentScienceQAMix/20250808213/result/output_checkpoint_19.json'
+    # file_path = 'OmniMod/ImageFuse/LatentScienceQAMix/20250809120/result/output_checkpoint_4.json'
+    # file_path = 'OmniMod/ImageFuse/LatentScienceQAMix/20250810175/result/output_checkpoint_6.json'
+
+    # file_path = 'OmniMod/ImageFuse/LatentScienceQAMix/20250810175/result/output_checkpoint_9.json'
+    
+    # MMMU
+    # file_path = 'OmniMod/ImageFuse/NormalMMMU/20250812194/result/output_checkpoint_9.json'
+    # file_path = 'OmniMod/ImageFuse/NormalMMMU/20250812203/result/output_checkpoint_29.json'
+    
+    # file_path = 'OmniMod/ImageFuse/LatentMMMU/20250812215/result/output_checkpoint_9.json'
+    # file_path = 'OmniMod/ImageFuse/LatentMMMU/20250814155/result/output_checkpoint_9.json' # num_latent_thoughts: 5
+
+    # file_path = 'OmniMod/ImageFuse/LatentMMMUMix/20250813072/result/output_checkpoint_9.json'
+    # file_path = 'OmniMod/ImageFuse/LatentMMMUMix/20250814155/result/output_checkpoint_9.json' # num_latent_thoughts: 5
     
 
+    ## MMStart
+    # file_path = 'OmniMod/ImageFuse/NormalMMMU/20250812194/result/output_MMStartcheckpoint_9.json'
+    # file_path = 'OmniMod/ImageFuse/LatentMMMU/20250812215/result/output_checkpoint_9.json'
+    # file_path = 'OmniMod/ImageFuse/LatentMMMUMix/20250813072/result/output_checkpoint_9.json'
+    file_path = 'OmniMod/ImageFuse/LatentMMMU/20250814155/result/output_MMStartcheckpoint_9.json'
+    # file_path = 'OmniMod/ImageFuse/LatentMMMUMix/20250814155/result/output_MMStartcheckpoint_9.json'
     
     # Output directory for saving metrics
     output_dir = os.path.dirname(file_path)

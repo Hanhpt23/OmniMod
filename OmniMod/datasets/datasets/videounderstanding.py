@@ -82,7 +82,8 @@ class VideoDataset(Dataset):
 
         answer = info['answer']
         question = info['question']
-        instruction = f"<VideoHere>Please analyze step by step: {question}"
+        # instruction = f"<VideoHere>Please analyze step by step: {question}"
+        instruction = f"<VideoHere>{question}"
 
         output_data = {
             "image_id": video_id,
