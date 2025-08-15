@@ -6,9 +6,9 @@ model:
   end_sym: "</s>"
   vision_model: "clip"
   audio_model: "whisper"
-  language_model: "meta-llama/Llama-3.2-1B"
-  ckpt: 
-  use_grad_checkpoint: True
+  language_model: "meta-llama/Llama-3.2-1B-Instruct"
+  ckpt: OmniMod/ImageFuse/NormalVQAv2/20250807212/checkpoint_1.pth
+  use_grad_checkpoint: False
   chat_template: True
   low_resource: True
   lora_r: 64
@@ -18,8 +18,9 @@ model:
   freeze_audio: True
   use_coconut: True  # Enable LatentReasoning reasoning
   use_multimodal_coconut: False  # Enable multimodal LatentReasoning (approach 2)
-  num_latent_thoughts: 1  # Number of latent thoughts (n)
+  num_latent_thoughts: 10  # Number of latent thoughts (n)
   coconut_discount_rate: 1.0  # discount/encourage rate (γ = 0.9 for discounting, γ = 1.1 for encouraging)
+  mu: 0.3 # Weight auxiliary loss
 
 
 datasets:
@@ -38,7 +39,9 @@ datasets:
     sample_ratio: 10
     build_info:
       image_path: ../../datasets_image/ScienceQA/images
-      ann_path: ../../datasets_image/ScienceQA/scienceqa_train.json
+      ann_path: ../../datasets_image/ScienceQA/train.json
+      # image_path: ../../datasets_image/MMMU/images
+      # ann_path: ../../datasets_image/MMMU/annotation/dev_data.json
       audio_path: None
 
 run:
@@ -50,7 +53,7 @@ run:
   warmup_lr: 1e-6
 
   weight_decay: 0.05
-  max_epoch: 5
+  max_epoch: 10
   num_workers: 2
   warmup_steps: 200
   iters_per_epoch: 1555 # total sample 6218/4 (batch size)

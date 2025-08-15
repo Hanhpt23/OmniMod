@@ -4,17 +4,17 @@ model:
   max_txt_len: 1024
   image_size: 224
   end_sym: </s>
-  language_model: meta-llama/Llama-3.2-1B
+  language_model: meta-llama/Llama-3.2-1B-Instruct
   vision_model: clip
   audio_model: whisper
-  ckpt: OmniMod/ImageFuse/Debug/20250807101/checkpoint_0.pth
-  use_grad_checkpoint: true
+  ckpt: OmniMod/ImageFuse/NormalMMMU/20250812203/checkpoint_29.pth
+  use_grad_checkpoint: false
   chat_template: true
   low_resource: true
   lora_r: 64
   lora_alpha: 16
   bits: 8
-  use_coconut: False
+  use_coconut: false
   use_multimodal_coconut: false
   num_latent_thoughts: 1
   coconut_discount_rate: 1.0
@@ -31,21 +31,21 @@ datasets:
       train:
         name: blip_caption
     build_info:
-      image_path: ../../datasets_image/ScienceQA/images
-      ann_path: ../../datasets_image/ScienceQA/scienceqa_train.json
+      image_path: ../../datasets_image/MMMU/images
+      ann_path: ../../datasets_image/MMMU/annotation/dev_data.json
       audio_path: None
 evaluation_datasets:
   image_val:
-    image_path: ../../datasets_image/ScienceQA/images
-    ann_path: ../../datasets_image/ScienceQA/scienceqa_test.json
+    image_path: ../../datasets_image/MMMU/images
+    ann_path: ../../datasets_image/MMMU/annotation/validation_data.json
     audio_path: None
     prompt_test: ''
-    batch_size: 2
+    batch_size: 4
     max_new_tokens: 50
-    temperature: 8.85
+    temperature: 0.1
     top_p: 0.9
     do_sample: true
 run:
   task: image_text_pretrain
   name: vqa_rad_evaluation
-  save_path: OmniMod/ImageFuse/NormalScienceQA
+  save_path: OmniMod/ImageFuse/NormalMMMU
