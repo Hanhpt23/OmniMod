@@ -1,4 +1,3 @@
-
 import logging
 import random
 import numpy as np
@@ -37,6 +36,42 @@ class CrossModalAttention(nn.Module):
         aligned_emb = aligned_emb.transpose(0, 1)
         return aligned_emb, attn_weights
 
+
+# class CrossModalAttention(nn.Module):
+#     def __init__(self, dim=4096, reduced_dim=1024, num_heads=8):
+#         super().__init__()
+#         # Project to a lower-dimensional space to reduce parameters
+#         self.proj_in = nn.Linear(dim, reduced_dim)
+#         self.attn = nn.MultiheadAttention(embed_dim=reduced_dim, num_heads=num_heads)
+#         self.norm = nn.LayerNorm(reduced_dim)
+#         # Project back to original dimension if needed
+#         self.proj_out = nn.Linear(reduced_dim, dim)
+    
+#     def forward(self, video_emb, audio_emb):
+#         if audio_emb is None:
+#             return video_emb.unsqueeze(0), None
+#         if video_emb.dim() == 2:
+#             video_emb = video_emb.unsqueeze(0)  # [1, seq_len, hidden_dim]
+#         if audio_emb is not None and audio_emb.dim() == 2:
+#             audio_emb = audio_emb.unsqueeze(0)  # [1, seq_len, hidden_dim]
+        
+#         video_emb = video_emb.transpose(0, 1)  # [seq_len, batch, hidden_dim]
+#         audio_emb = audio_emb.transpose(0, 1)  # [seq_len, batch, hidden_dim]
+        
+#         with torch.cuda.amp.autocast(enabled=True):
+#             # Project inputs to reduced dimension
+#             video_emb = self.proj_in(video_emb)
+#             audio_emb = self.proj_in(audio_emb)
+#             # Apply attention
+#             aligned_emb, attn_weights = self.attn(video_emb, audio_emb, audio_emb)
+#             # Residual connection and normalization
+#             aligned_emb = self.norm(aligned_emb + video_emb)
+#             # Project back to original dimension
+#             aligned_emb = self.proj_out(aligned_emb)
+        
+#         aligned_emb = aligned_emb.transpose(0, 1)  # [batch, seq_len, hidden_dim]
+#         return aligned_emb, attn_weights
+    
 class MultimodalLatentAttention(nn.Module):
     def __init__(self, llm_hidden_dim, mixed_dim=2048, num_heads=8):
         super().__init__()
@@ -475,10 +510,11 @@ class OmniModBase(BaseModel):
                             dim=1
                         )
 
-                        # Add auxiliary loss for intermediate thoughts
-                        aux_outputs = self.language_model(inputs_embeds=latent_embeds, attention_mask=latent_attention_mask, return_dict=True, labels=latent_targets)
-                        # logger.info(f"aux_outputs: {aux_outputs.loss}")
-                        total_loss += aux_outputs.loss * self.mu #0.3  # Weight auxiliary loss
+                        if self.mu:
+                            # Add auxiliary loss for intermediate thoughts
+                            aux_outputs = self.language_model(inputs_embeds=latent_embeds, attention_mask=latent_attention_mask, return_dict=True, labels=latent_targets)
+                            # logger.info(f"aux_outputs: {aux_outputs.loss}")
+                            total_loss += aux_outputs.loss * self.mu #0.3  # Weight auxiliary loss
 
                     else:
                         # Final language mode: compute loss

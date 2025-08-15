@@ -1,4 +1,3 @@
-
 from OmniMod.common.registry import registry
 from OmniMod.processors.base_processor import BaseProcessor
 from omegaconf import OmegaConf
