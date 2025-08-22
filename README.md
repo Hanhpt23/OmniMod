@@ -1,6 +1,6 @@
 # Multimodal Chain of Continuous Thought for Latent-Space Reasoning in Vision-Language Models
 
-[![arXiv](https://img.shields.io/badge/arXiv-pending-red.svg)](https://arxiv.org/pdf/2508.12587) 
+[![arXiv](https://img.shields.io/badge/Arxiv-2508.12587-AD1C18.svg?logo=arXiv)](https://arxiv.org/pdf/2508.12587) 
 
 OmniMod is an open-source implementation of the **Multimodal Chain of Continuous Thought (MCOUT)** framework, a novel approach for enhancing reasoning in large multimodal models (LMMs). Inspired by human reflective cognition, MCOUT enables iterative reasoning in a continuous latent space, dynamically aligning visual and textual embeddings. This repository provides the code to reproduce the experiments from the associated paper, including model architecture, training pipelines, and evaluation on benchmarks like ScienceQA, MMMU, MMStar, and VQAv2.
 
