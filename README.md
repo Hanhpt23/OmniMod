@@ -55,12 +55,9 @@ The `requirements.txt` includes:
 - `transformers>=4.35.0` (for Llama and Hugging Face integrations)
 - `peft` (for LoRA fine-tuning)
 - `datasets` (for loading benchmarks)
-- `open-clip-torch` (for CLIP visual encoder)
-- `evaluate` and `nltk` (for metrics like BLEU)
-- Other utilities: `numpy`, `pandas`, `tqdm`, `wandb` (optional for logging)
 
 **Notes**:
-- Ensure CUDA is installed for GPU acceleration (e.g., `nvidia-smi` should show your GPU).
+- Ensure CUDA is installed for GPU acceleration.
 - If using 8-bit precision, install `bitsandbytes`.
 - Hugging Face login: Run `huggingface-cli login` to access models like Llama 3.2.
 
@@ -83,16 +80,16 @@ Output will be stored in a json file with the same parent path of the checkpoint
 
 - Prepare datasets for training and evaluation. The annotation would be stored in a json file with 3 keys for each samples. Below is an example of the MMMU data.
 
-{
+[{
 "video_name": "dev_Accounting_1.png",
 "question": "Each of the following situations relates to a different company.  For company B, find the missing amounts. A. $63,020   B. $58,410   C. $71,320   D. $77,490",
 "answer": "D"
-},
+},...]
 
 - Set up the path to data in file `train_configs/train_image.yaml` and `eval_configs/evaluate_image.yaml`
 
 ### Supported Datasets
-- **VQAv2**: For pretraining. Download from [checkpoint VQAv2](https://visualqa.org/download.html). Extract images and annotations.
+- **VQAv2**: For pretraining. Download from [checkpoint VQAv2](). Extract images and annotations.
 - **ScienceQA**: For fine-tuning. Download from [Baseline](), [MCOUT-Base](), [MCOUNT-Multi]().
 - **MMMU**: For fine-tuning. Download from [Baseline](), [MCOUT-Base](), [MCOUNT-Multi]().
 - **MMStar**: For testing. We use all pretrained weight from MMMU.
@@ -202,9 +199,10 @@ Ablation on auxiliary weight \(\mu\) (N_t=5, MCOUT-Base):
 Higher μ increases training time but optimal at 0.3.
 
 ## Contributing
-Contributions welcome! 
+Contributions are welcome!  
 
-We are extending the pipeline to video+audio understanding, if you are interested, please reach out to us by email (hanhpt.phamtan@gmail.com).
+We are extending the pipeline to support multimodal input understanding. If you are interested, please reach out to us at hanhpt.phamtan@gmail.com.
+
 
 
 
