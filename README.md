@@ -107,7 +107,7 @@ bash scripts/FuseImage/train.sh
 - For MCOUT-Base, set `use_coconut` is `True` in `train_configs/train_image.yaml` and `eval_configs/evaluate_image.yaml`. 
 - For MCOUT-Multi, set `use_coconut` is `True` and `use_multimodal_coconut` is `True` in `train_configs/train_image.yaml` 
 - Set `num_latent_thoughts` in the 2 for coefficient
-- Auxiliary loss: Balances intermediate thoughts; ablation suggests \(\mu=0.3\) optimal. set mu > if you want to use the auxiliary loss, otherwise set it to 0.
+- Auxiliary loss: Balances intermediate thoughts; ablation suggests \(\mu=0.3\) optimal. set mu > enable the auxiliary loss, or set it to 0 to disable it.
 
 ## Inference and Evaluation
 
