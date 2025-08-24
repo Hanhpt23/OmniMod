@@ -89,7 +89,7 @@ Output will be stored in a json file with the same parent path of the checkpoint
   },
   ...
 ]
-
+```
 - Set up the path to data in file `train_configs/train_image.yaml` and `eval_configs/evaluate_image.yaml`
 
 ### Supported Datasets
