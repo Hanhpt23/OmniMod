@@ -28,7 +28,7 @@ For more details, refer to the [paper](https://arxiv.org/pdf/2508.12587).
 - **Latent Reasoning in Multimodal Space**: Iterative refinement of continuous thoughts without relying on discrete token sequences.
 - **Variants**: MCOUT-Base (simple hidden state reuse) and MCOUT-Multi (with multimodal latent attention).
 - **Efficient Training**: Uses LoRA for parameter-efficient fine-tuning on a single GPU.
-- **Benchmarks Supported**: VQAv2 (pretraining), ScienceQA, MMMU (fine-tuning), MMStar (testing).
+- **Benchmarks Supported**: [VQAv2](https://visualqa.org/download.html) (pretraining), [ScienceQA](https://huggingface.co/datasets/derek-thomas/ScienceQA) (fine-tuning), [MMMU](https://huggingface.co/datasets/lmms-lab/MMMU) (fine-tuning), [MMStar](https://huggingface.co/datasets/Lin-Chen/MMStar) (testing).
 - **Metrics**: Accuracy and BLEU for evaluation.
 - **Compatibility**: Works with small VLMs like CLIP + Llama 3.2 1B; extensible to larger models.
 
@@ -78,13 +78,17 @@ Output will be stored in a json file with the same parent path of the checkpoint
 
 ## Data Preparation
 
-- Prepare datasets for training and evaluation. The annotation would be stored in a json file with 3 keys for each samples. Below is an example of the MMMU data.
+- Prepare datasets for training and evaluation. The annotation would be stored in a json file with 3 keys for each samples. Below is an example of the [MMMU](https://huggingface.co/datasets/lmms-lab/MMMU) data.
 
-[{
-"video_name": "dev_Accounting_1.png",
-"question": "Each of the following situations relates to a different company.  For company B, find the missing amounts. A. $63,020   B. $58,410   C. $71,320   D. $77,490",
-"answer": "D"
-},...]
+```json
+[
+  {
+    "video_name": "dev_Accounting_1.png",
+    "question": "Each of the following situations relates to a different company. For company B, find the missing amounts. A. $63,020 B. $58,410 C. $71,320 D. $77,490",
+    "answer": "D"
+  },
+  ...
+]
 
 - Set up the path to data in file `train_configs/train_image.yaml` and `eval_configs/evaluate_image.yaml`
 
@@ -123,8 +127,6 @@ torchrun --nproc_per_node 1 evaluate.py \
 Output will be stored in a json file with the same parent path of the checkpoint, including the generated answer and and prediction. To see the result, pleas path the json path to `OmniMod/metrics/metrics.py`. This computes metrics and saves predictions. 
 
 ## Main Results
-
-Reproduced results from the paper (1B parameter model):
 
 ### ScienceQA Test Set
 | Model                  | Parameters (B) | Accuracy (%) | BLEU    |
@@ -187,7 +189,7 @@ Reproduced results from the paper (1B parameter model):
 
 ## Ablation Studies
 
-Ablation on auxiliary weight \(\mu\) (N_t=5, MCOUT-Base):
+Ablation on auxiliary weight (μ) (N_t=5, MCOUT-Base):
 
 | Auxiliary Weight (μ) | ScienceQA Acc (%) | ScienceQA BLEU | MMMU Acc (%) | MMMU BLEU |
 |----------------------|-------------------|----------------|--------------|-----------|
@@ -198,12 +200,9 @@ Ablation on auxiliary weight \(\mu\) (N_t=5, MCOUT-Base):
 
 Higher μ increases training time but optimal at 0.3.
 
-## Contributing
-Contributions are welcome!  
+## Next
 
-We are extending the pipeline to support multimodal input understanding. If you are interested, please reach out to us at hanhpt.phamtan@gmail.com.
-
-
+We are extending the pipeline to support multimodal understanding including images, videos and audios. If you are interested, please reach out to us at hanhpt.phamtan@gmail.com.
 
 
 ## Citation
