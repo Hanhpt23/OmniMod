@@ -73,8 +73,12 @@ torchrun --nproc_per_node 1 evaluate.py \
       --cfg-path eval_configs/evaluate_image.yaml \
       --eval-dataset image_val
 ```
+- Note: Output will be stored in a json file with the same parent path of the checkpoint, including the generated answer and and prediction.
+3. Update the josn path in OmniMod/metrics/metrics.py, then run it to calculate the metrics.
 
-Output will be stored in a json file with the same parent path of the checkpoint, including the generated answer and and prediction.
+```bash
+python OmniMod/metrics/metrics.py
+```
 
 ## Data Preparation
 
@@ -202,7 +206,7 @@ Higher μ increases training time but optimal at 0.3.
 
 ## Next
 
-We are extending the pipeline to support multimodal understanding including images, videos and audios. If you are interested, please reach out to us at hanhpt.phamtan@gmail.com.
+We are optimizing the pipeline and extending the pipeline to support multimodal understanding including images, videos, and audios. If you are interested, please reach out to us at hanhpt.phamtan@gmail.com.
 
 
 ## Citation
