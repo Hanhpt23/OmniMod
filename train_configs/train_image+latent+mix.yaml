@@ -73,5 +73,5 @@ run:
   distributed: False
 
   wandb_log: True
-  wandb_token: "e7134de62fe8b5b393083a97985006950575f545"
+  wandb_token: 
   job_name: LatentScienceQAMix
