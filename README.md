@@ -2,10 +2,10 @@
   <h1>OmniMod</h1>
 </div>
 
-*OmniMod is the library for multimodal understanding including images, videos, and audios*
+*OmniMod is the library for multimodal understanding including images, videos, and audios*.
 
 ## Update:
-✅ Aug. 2025 - We release the code for image understanding with multimodal chain of continuous latent reasoning
+✅ Aug. 24, 2025 - We release the code for image understanding with multimodal chain of continuous latent reasoning.
 
 
 # Multimodal Chain of Continuous Thought for Latent-Space Reasoning in Vision-Language Models
