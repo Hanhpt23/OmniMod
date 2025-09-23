@@ -5,7 +5,8 @@
 *OmniMod is the library for multimodal understanding including images, videos, and audios*.
 
 ## Update:
-✅ Aug. 24, 2025 - We release the code for image understanding with multimodal chain of continuous latent reasoning.
+✅ Sept. 22, 2025 – Our paper was accepted to the NeurIPS 2025 Efficient Reasoning Workshop, and we have released the full ablation results and the checkpoint of the best model.
+✅ Aug. 24, 2025 – We release the code for image understanding with multimodal chain of continuous latent reasoning.
 
 
 # Multimodal Chain of Continuous Thought for Latent-Space Reasoning in Vision-Language Models
@@ -107,9 +108,9 @@ python OmniMod/metrics/metrics.py
 - Set up the path to data in file `train_configs/train_image.yaml` and `eval_configs/evaluate_image.yaml`
 
 ### Supported Datasets
-- **VQAv2**: For pretraining. Download from [checkpoint VQAv2](). Extract images and annotations.
-- **ScienceQA**: For fine-tuning. Download from [Baseline](), [MCOUT-Base](), [MCOUNT-Multi]().
-- **MMMU**: For fine-tuning. Download from [Baseline](), [MCOUT-Base](), [MCOUNT-Multi]().
+- **VQAv2**: For pretraining. Download from [checkpoint VQAv2](https://drive.google.com/file/d/1NJxCNBiqLBcE5dUgCHiwfF05w35SAsBQ/view?usp=sharing). Extract images and annotations.
+- **ScienceQA**: For fine-tuning. Download from [ScienceQA](https://drive.google.com/file/d/1lI04-tlMkGTAa9aYpRPJEQMYcYG_VqQ4/view?usp=sharing).
+- **MMMU**: For fine-tuning. Download from [MMMU](https://drive.google.com/file/d/1LiFRlN_fFcI778j-wWqDQkkt1b5A19Iq/view?usp=sharing).
 - **MMStar**: For testing. We use all pretrained weight from MMMU.
 
 
@@ -209,8 +210,14 @@ Ablation on auxiliary weight (μ) (N_t=5, MCOUT-Base):
 |----------------------|-------------------|----------------|--------------|-----------|
 | 0                    | 58.12 (↑3.47%)    | 52.05 (↑1.11%) | 27.41 (↑7.75%) | 27.43 (↑7.82%) |
 | 0.3                  | 58.60 (↑4.33%)    | 52.44 (↑1.87%) | 27.53 (↑8.23%) | 27.54 (↑8.27%) |
+| MCOUT-Base   | 0.3   | **58.60 (↑4.33%)** | **52.44 (↑1.87%)** | **27.53 (↑8.23%)** | **27.54 (↑8.27%)** |
 | 0.5                  | 57.56 (↑2.48%)    | 52.10 (↑1.20%) | 26.44 (↑3.93%) | 26.44 (↑3.93%) |
 | 0.8                  | 57.52 (↑2.40%)    | 52.00 (↑1.01%) | 25.90 (↑1.81%) | 25.91 (↑1.85%) |
+| **Fully finetuning model with LoRA** |                   |                |               |              |           |
+| **Baseline** | –                     | 62.61             | 54.96          | 26.55        | 26.56     |
+| MCOUT-Base   | 0                     | 64.60 (↑3.18%)    | **56.73 (↑3.22%)** | 27.98 (↑5.39%) | 27.99 (↑5.39%) |
+| MCOUT-Multi  | 0                     | **64.75 (↑3.42%)** | 56.64 (↑3.06%) | **28.11 (↑5.88%)** | **28.11 (↑5.83%)** |
+
 
 Higher μ increases training time but optimal at 0.3.
 
