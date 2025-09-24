@@ -5,7 +5,7 @@
 *OmniMod is the library for multimodal understanding including images, videos, and audios*.
 
 ## Update:
-✅ Sept. 22, 2025 – Our paper was accepted to the NeurIPS 2025 Efficient Reasoning Workshop, and we have released the full ablation results and the checkpoint of the best model.
+✅ Sept. 22, 2025 – Our paper was accepted to the NeurIPS 2025 Efficient Reasoning Workshop with core idea and preliminary results, and we have released the full ablation results and the checkpoint of the best model.
 
 ✅ Aug. 24, 2025 – We release the code for image understanding with multimodal chain of continuous latent reasoning.
 
